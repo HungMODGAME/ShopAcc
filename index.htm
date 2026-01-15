@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hùng PC Shop Acc</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-body: #0f121a;
+            --bg-card: #1a1d27;
+            --bg-input: #252a34;
+            --border-green: #8bc34a;
+            --color-blue: #00aeef;
+            --color-red: #ff4d4d;
+            --color-gray: #7f8c8d;
+        }
+
+        body { font-family: 'Roboto', sans-serif; background-color: var(--bg-body); color: white; margin: 0; padding: 0; }
+        
+        /* --- HEADER --- */
+        header {
+            background-color: var(--bg-card);
+            padding: 10px 5%;
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
+            border-bottom: 2px solid var(--border-green);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            gap: 15px;
+        }
+
+        .logo-container {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-decoration: none;
+        }
+
+        .logo-container img {
+            height: 45px;
+            width: auto;
+            border-radius: 5px;
+        }
+
+        .logo-text {
+            font-size: 20px;
+            font-weight: bold;
+            color: var(--border-green);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .main-wrapper { max-width: 1000px; margin: 20px auto; padding: 0 10px; }
+
+        /* --- BỘ LỌC --- */
+        .filter-section { background-color: var(--bg-card); padding: 20px; border-radius: 15px; margin-bottom: 25px; border: 1px solid #2d3446; }
+        .filter-group { margin-bottom: 15px; }
+        .filter-label { font-size: 14px; font-weight: bold; margin-bottom: 8px; display: flex; align-items: center; text-transform: uppercase;}
+        .label-price { color: #4caf50; } .label-sort { color: #42a5f5; } .label-search { color: #ab47bc; }
+        select, input { width: 100%; padding: 12px; background-color: var(--bg-input); border: 1px solid #3d4452; border-radius: 10px; color: white; outline: none; box-sizing: border-box; }
+        .search-action-group { display: flex; gap: 10px; margin-top: 10px; }
+        .btn-search { background-color: var(--color-blue); border: none; color: white; padding: 12px; border-radius: 10px; cursor: pointer; flex-grow: 1; font-weight: bold; font-size: 20px; }
+        .btn-reset { background-color: #3d4452; border: none; color: white; width: 60px; border-radius: 10px; cursor: pointer; font-size: 20px; }
+
+        /* --- CARD SẢN PHẨM --- */
+        .product-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 20px; }
+        .product-card { background-color: var(--bg-card); border: 2.5px solid var(--border-green); border-radius: 15px; padding: 12px; position: relative; }
+        .product-img-container { position: relative; width: 100%; border-radius: 10px; overflow: hidden; margin-bottom: 12px; }
+        .product-img-container img { width: 100%; display: block; }
+        .ms-tag { position: absolute; top: 10px; left: 10px; background: rgba(0,0,0,0.85); color: #8bc34a; padding: 4px 10px; border-radius: 5px; font-weight: bold; font-size: 13px; border: 1px solid var(--border-green); }
+        
+        .product-tags { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 12px; }
+        .tag { padding: 10px; border-radius: 8px; font-weight: bold; font-size: 13px; text-align: center; display: flex; align-items: center; justify-content: center; }
+        .tag-vip { background: #6a1b9a; } .tag-mail { background: #2c3e50; }
+        .tag-check { background: white; color: black; border-radius: 50%; width: 16px; height: 16px; font-size: 10px; margin-right: 6px; display: flex; align-items: center; justify-content: center; }
+
+        /* CSS MỚI CHO PHẦN GIÁ */
+        .product-action { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        .price-box { 
+            border: 1.5px dashed #ffffff80; 
+            padding: 5px; 
+            border-radius: 10px; 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            justify-content: center;
+        }
+        .old-price-text { text-decoration: line-through; color: var(--color-gray); font-size: 12px; }
+        .new-price-text { color: white; font-weight: bold; font-size: 16px; }
+
+        .btn-detail { background: var(--color-blue); color: white; text-decoration: none; padding: 10px; border-radius: 10px; text-align: center; font-weight: bold; cursor: pointer; border: none; font-size: 16px; }
+
+        /* --- MODAL CHI TIẾT --- */
+        .modal { display: none; position: fixed; z-index: 10000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(10, 12, 18, 0.95); overflow-y: auto; }
+        .modal-content { background: #1a1d27; margin: 20px auto; padding: 20px; width: 95%; max-width: 650px; border-radius: 20px; position: relative; border: 1px solid #333; }
+        .close-btn { position: absolute; top: 15px; right: 15px; font-size: 28px; color: white; cursor: pointer; z-index: 11; }
+        .modal-header-title { font-size: 22px; font-weight: bold; text-align: center; margin-bottom: 5px; }
+        .modal-header-title span { color: var(--color-red); }
+        
+        /* GIÁ TRONG MODAL */
+        .modal-price-container { text-align: center; margin: 15px 0; }
+        .modal-old-price { text-decoration: line-through; color: var(--color-gray); font-size: 18px; margin-right: 10px; }
+        .modal-new-price { color: var(--color-blue); font-size: 24px; font-weight: bold; }
+
+        .modal-img-list img { width: 100%; border-radius: 12px; margin-bottom: 10px; border: 1px solid #333; }
+        .btn-pay-main { background-color: #111; color: white; border: 2px solid #333; padding: 15px; border-radius: 12px; width: 100%; font-size: 18px; font-weight: bold; cursor: pointer; margin-top: 10px; display: flex; align-items: center; justify-content: center; }
+
+        .pay-options { display: none; margin-top: 15px; gap: 10px; animation: fadeIn 0.4s; }
+        .opt-zalo { background: #0068ff; color: white; flex: 1; padding: 12px; border-radius: 10px; text-decoration: none; font-weight: bold; text-align: center; }
+        .opt-tele { background: #24A1DE; color: white; flex: 1; padding: 12px; border-radius: 10px; text-decoration: none; font-weight: bold; text-align: center; }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+    </style>
+</head>
+<body>
+
+<header>
+    <a href="#" class="logo-container">
+        <img src="https://i.imgur.com/dEp44EC.png" alt="Logo">
+        <span class="logo-text">Hùng PC</span>
+    </a>
+</header>
+
+<div class="main-wrapper">
+    <div class="filter-section">
+        <div class="filter-group">
+            <div class="filter-label label-price">🏷 MỨC GIÁ</div>
+            <select id="priceFilter">
+                <option value="all">Tất cả</option>
+                <option value="0-500000">Dưới 500.000đ</option>
+                <option value="500000-1000000">500.000đ - 1.000.000đ</option>
+                <option value="1000000-99999999">Trên 1.000.000đ</option>
+            </select>
+        </div>
+        <div class="filter-group">
+            <div class="filter-label label-sort">↕ SẮP XẾP</div>
+            <select id="sortOrder">
+                <option value="default">Mặc định</option>
+                <option value="highToLow">Giá cao đến thấp</option>
+                <option value="lowToHigh">Giá thấp đến cao</option>
+            </select>
+        </div>
+        <div class="filter-group">
+            <div class="filter-label label-search">🔍 TÌM KIẾM (MÃ SỐ)</div>
+            <input type="text" id="searchInput" placeholder="Nhập mã số tài khoản...">
+        </div>
+        <div class="search-action-group">
+            <button class="btn-search" onclick="applyFilter()">🔍</button>
+            <button class="btn-reset" onclick="resetAll()">↻</button>
+        </div>
+    </div>
+
+    <div class="product-grid" id="productContainer"></div>
+</div>
+
+<div id="productModal" class="modal">
+    <div class="modal-content">
+        <span class="close-btn" onclick="closeModal()">&times;</span>
+        <div id="modalBody"></div>
+        <button class="btn-pay-main" onclick="togglePay()">💳 Thanh Toán</button>
+        <div id="payOptions" class="pay-options">
+            <a href="https://zalo.me/0346593904" class="opt-zalo" target="_blank">Zalo</a>
+            <a href="https://t.me/vhfabr" class="opt-tele" target="_blank">Telegram</a>
+        </div>
+    </div>
+</div>
+
+<script>
+    const products = [
+        { 
+            id: "10798", 
+            name: "ACC 500K - 2TR", 
+            oldPrice: 2500000, // THÊM GIÁ CŨ Ở ĐÂY
+            price: 2000000, 
+            vip: "VIP 5", 
+            mail: "ĐỔI MAIL XT", 
+            thumb: "https://i.imgur.com/L5khVS2.png",
+            images: [
+                "https://i.imgur.com/L5khVS2.png",
+
+                "https://i.imgur.com/zZE26Sj.png",
+
+                "https://i.imgur.com/PwhGYyB.png",
+
+                "https://i.imgur.com/EZuHWS3.png",
+
+                "https://i.imgur.com/uPzqeix.png",
+
+                "https://i.imgur.com/OSW4eS1.png",
+
+                "https://i.imgur.com/ETwPlh3.png",
+
+                "https://i.imgur.com/AjzOSvE.png",
+
+                "https://i.imgur.com/GbhP9ew.png",
+
+                "https://i.imgur.com/QUnYGBP.png",
+
+                "https://i.imgur.com/aIC9aO1.png",
+
+                "https://i.imgur.com/rUmktFh.png",
+
+                "https://i.imgur.com/WSEF0ei.png",
+
+                "https://i.imgur.com/nbMxgQ8.png",
+
+                "https://i.imgur.com/PkZnrgZ.png",
+
+                "https://i.imgur.com/yr2dH8n.png",
+
+                "https://i.imgur.com/uSejNV0.png",
+
+                "https://i.imgur.com/JAJnQBH.png",
+
+                "https://i.imgur.com/G3ZsPoa.png",
+
+                "https://i.imgur.com/CBtXcgy.png",
+
+                "https://i.imgur.com/eaboGbI.png"
+            ]
+        }
+    ];
+
+    const container = document.getElementById('productContainer');
+
+    function render(data) {
+        container.innerHTML = '';
+        data.forEach(p => {
+            container.innerHTML += `
+                <div class="product-card">
+                    <div class="product-img-container">
+                        <div class="ms-tag">MS: ${p.id}</div>
+                        <img src="${p.thumb}">
+                    </div>
+                    <div class="product-tags">
+                        <div class="tag tag-vip"><span class="tag-check">✓</span> ${p.vip}</div>
+                        <div class="tag tag-mail"><span class="tag-check">✓</span> ${p.mail}</div>
+                    </div>
+                    <div class="product-action">
+                        <div class="price-box">
+                            <span class="old-price-text">${p.oldPrice.toLocaleString()} đ</span>
+                            <span class="new-price-text">💳 ${p.price.toLocaleString()} đ</span>
+                        </div>
+                        <button class="btn-detail" onclick="openModal('${p.id}')">🛒 Chi Tiết</button>
+                    </div>
+                </div>
+            `;
+        });
+    }
+
+    function applyFilter() {
+        let priceRange = document.getElementById('priceFilter').value;
+        let sortOrder = document.getElementById('sortOrder').value;
+        let keyword = document.getElementById('searchInput').value.toLowerCase();
+        let result = [...products];
+
+        if (keyword) result = result.filter(p => p.id.includes(keyword));
+        if (priceRange !== "all") {
+            let [min, max] = priceRange.split('-').map(Number);
+            result = result.filter(p => p.price >= min && p.price <= max);
+        }
+        if (sortOrder === "highToLow") result.sort((a, b) => b.price - a.price);
+        if (sortOrder === "lowToHigh") result.sort((a, b) => a.price - b.price);
+        render(result);
+    }
+
+    function openModal(id) {
+        const p = products.find(item => item.id === id);
+        const modalBody = document.getElementById('modalBody');
+        let imgs = p.images.map(i => `<img src="${i}">`).join('');
+        modalBody.innerHTML = `
+            <div class="modal-header-title">Chi Tiết Tài Khoản <span>#${p.id}</span></div>
+            <div class="modal-price-container">
+                <span class="modal-old-price">${p.oldPrice.toLocaleString()} đ</span>
+                <span class="modal-new-price">Giá: ${p.price.toLocaleString()} đ</span>
+            </div>
+            <div class="modal-img-list">${imgs}</div>
+        `;
+        document.getElementById('productModal').style.display = "block";
+        document.getElementById('payOptions').style.display = "none";
+        document.body.style.overflow = "hidden";
+    }
+
+    function closeModal() { 
+        document.getElementById('productModal').style.display = "none"; 
+        document.body.style.overflow = "auto";
+    }
+
+    function togglePay() {
+        let opt = document.getElementById('payOptions');
+        opt.style.display = (opt.style.display === "flex") ? "none" : "flex";
+    }
+
+    function resetAll() {
+        document.getElementById('searchInput').value = '';
+        document.getElementById('priceFilter').value = 'all';
+        document.getElementById('sortOrder').value = 'default';
+        render(products);
+    }
+
+    render(products);
+</script>
+
+</body>
+</html>
